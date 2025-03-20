@@ -8,7 +8,7 @@ img=np.float64(cv2.imread('../Image_Pairs/Graffiti0.png',cv2.IMREAD_GRAYSCALE))
 (h,w) = img.shape
 print("Dimension de l'image :",h,"lignes x",w,"colonnes")
 print("Type de l'image :",img.dtype)
-sigmas = [1, 2, 320]
+sigmas = [1, 2, 3200]
 
 fig, axes = plt.subplots(len(sigmas), 3, figsize=(12, 2.5 * len(sigmas)))
 
@@ -33,7 +33,7 @@ for i, s in enumerate(sigmas):
     #Gaussian fenetre pour reduire le bruit
     #Nous pouvons creer un gaussian kernel et faire des conv 
     #ou utiliser la function du cv2
-    window_size = 3  # Taille de la fenetre gaussiane
+    window_size = 7  # Taille de la fenetre gaussiane
     kernel_size = (window_size, window_size)
     alpha = 0.04  # Ponderation parameter [0.04, 0.06]
     sigma = np.sqrt(2 * s)
@@ -41,14 +41,14 @@ for i, s in enumerate(sigmas):
     Ixx = cv2.GaussianBlur(Ix * Ix, kernel_size, sigmaX = sigma)
     Iyy = cv2.GaussianBlur(Iy * Iy, kernel_size, sigmaX = sigma)
     Ixy = cv2.GaussianBlur(Ix * Iy, kernel_size, sigmaX = sigma)
-    print(Ixx)
-    #Normalizing des valeurs negatives et positives
-    Theta = cv2.normalize(Theta, None, 0, 255, cv2.NORM_MINMAX)
+    
 
     #Compute the Harris response function (Theta)
     det_M = Ixx * Iyy - Ixy**2  # Determinant of M
     trace_M = Ixx + Iyy  # Trace of M
     Theta = det_M - alpha * (trace_M**2)  # Harris response
+    
+
 
     # Calcul des maxima locaux et seuillage
     Theta_maxloc = cv2.copyMakeBorder(Theta,0,0,0,0,cv2.BORDER_REPLICATE)
@@ -81,14 +81,17 @@ for i, s in enumerate(sigmas):
                         [0, 1, 0, 1, 0],
                         [1, 0, 0, 0, 1]])
     Theta_ml_dil = cv2.dilate(Theta_maxloc,se_croix)
-
+    number_points = np.sum(Theta_ml_dil > 0)
     #Relecture image pour affichage couleur
     Img_pts=cv2.imread('../Image_Pairs/Graffiti0.png',cv2.IMREAD_COLOR)
     (h,w,c) = Img_pts.shape
     print("Dimension de l'image :",h,"lignes x",w,"colonnes x",c,"canaux")
-    print("Type de l'image :",Img_pts.dtype)
+    print("Type de l'image :",Img_pts.dtype, " Number of points : ", number_points,"\n")
     #On affiche les points (croix) en rouge
     Img_pts[Theta_ml_dil > 0] = [255,0,0]
+    #Normalizing des valeurs negatives et positives
+    Img_pts = cv2.normalize(Img_pts, None, 0, 255, cv2.NORM_MINMAX)
+
     axes[i, 2].imshow(cv2.cvtColor(Img_pts, cv2.COLOR_BGR2RGB))
     axes[i, 2].set_title(f'Points de Harris (σ={s})' )
 
