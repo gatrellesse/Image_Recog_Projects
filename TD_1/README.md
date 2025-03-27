@@ -121,3 +121,5 @@ Comme bien expliqué dans l'exercice précédent, les deux détecteurs et descri
 - Le descripteur M-SURF est aligné selon cette orientation, ce qui le rend invariant à la rotation.
 
 ## Question 8
+Rascunho:
+Once it is created, two important methods are BFMatcher.match() and BFMatcher.knnMatch(). First one returns the best match. Second method returns k best matches where k is specified by the user. It may be useful when we need to do additional work on that.
