@@ -120,6 +120,26 @@ Comme bien expliqué dans l'exercice précédent, les deux détecteurs et descri
 
 - Le descripteur M-SURF est aligné selon cette orientation, ce qui le rend invariant à la rotation.
 
-## Question 8
-Rascunho:
-Once it is created, two important methods are BFMatcher.match() and BFMatcher.knnMatch(). First one returns the best match. Second method returns k best matches where k is specified by the user. It may be useful when we need to do additional work on that.
+## Question 8 FEITO
+En expérimentant les trois matchers : BFMatcher.match(), flann.knnMatch() et BFMatcher.knnMatch(), on remarque des résultats très distincts.  
+
+Pour l’ORB, les matchers utilisant Brute-Force donnent de meilleurs résultats que celui utilisant FLANN, qui repose sur le K-nearest neighbors (KNN). Ce dernier n'est pas une bonne méthode de comparaison pour un vecteur binaire, mais il fonctionne bien pour les descripteurs en nombres flottants. Ainsi, Brute-Force avec best match est la meilleure méthode pour ORB, suivi de Brute-Force avec KNN.  
+
+Quant à KAZE, les résultats sont globalement très similaires. Brute-Force avec match reste la meilleure option, mais les performances de KNN se sont nettement améliorées par rapport à ORB, car KAZE travaille avec des descripteurs en nombres flottants.
+
+
+Les deux descripteurs utilisent des calculs de distance différents, car chacun retourne un type de variable différent avec la fonction `cv2.detectAndCompute`.  
+KAZE retourne un vecteur de 64 valeurs en virgule flottante, tandis que ORB renvoie un vecteur binaire de 256 bits.  
+Cela signifie que pour calculer la distance entre deux points avec KAZE, il faut utiliser la **norme euclidienne (Norm_L2)** :
+$$d = \sqrt{\sum_{i=1}^{n} (x_i - y_i)^2}$$
+
+où $ x_i $ et $ y_i $ sont les valeurs des descripteurs pour deux points.
+
+
+En revanche, pour calculer la distance entre deux points avec **ORB**, il faut utiliser la **distance de Hamming (Norm_Hamming)** : 
+
+$$d = \sum_{i=1}^{256} (x_i \oplus y_i)$$
+
+où $ \oplus $ représente l'opérateur XOR bit à bit.
+
+
