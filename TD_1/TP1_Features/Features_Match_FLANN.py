@@ -52,6 +52,12 @@ gray2 =  cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
 #Détection et description des keypoints
 pts1, desc1 = kp1.detectAndCompute(gray1,None)
 pts2, desc2 = kp2.detectAndCompute(gray2,None)
+
+# Conversion nécessaire pour ORB
+if detector == 1:
+    desc1 = desc1.astype(np.float32)
+    desc2 = desc2.astype(np.float32)
+
 t2 = cv2.getTickCount()
 time = (t2 - t1)/ cv2.getTickFrequency()
 print("Détection points et calcul descripteurs :",time,"s")
