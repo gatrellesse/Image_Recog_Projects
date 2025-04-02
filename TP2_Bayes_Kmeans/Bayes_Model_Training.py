@@ -61,7 +61,14 @@ first = 1
 # Choix du modèle
 # Par défaut de prior, ceux-ci sont calculés par la proportion de données fournies
 # Alternativement on peut fixer les priors par ex : priors = [0.3,0.7]
+
+# Multivariate Gaussian distribution with density:
+# P(x/y=k) --> posteriori
 clf = QuadraticDiscriminantAnalysis(priors = None)
+
+#  Naive Gaussian distribution :
+# Conditional independence between every pair 
+# y = argmax P(y) * prod i= 1 to N(P(xi/y)) -- >It is also a Maximum a posteriori(MAP)
 #clf = GaussianNB(priors = None)
 
 classes = np.unique([-1, 1])
