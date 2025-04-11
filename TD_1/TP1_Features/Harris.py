@@ -4,11 +4,11 @@ import cv2
 from matplotlib import pyplot as plt
 
 #Lecture image en niveau de gris et conversion en float64
-img=np.float64(cv2.imread('../Image_Pairs/Graffiti0.png',cv2.IMREAD_GRAYSCALE))
+img=np.float64(cv2.imread('Image_Pairs\\Graffiti0.png',cv2.IMREAD_GRAYSCALE))
 (h,w) = img.shape
 print("Dimension de l'image :",h,"lignes x",w,"colonnes")
 print("Type de l'image :",img.dtype)
-sigmas = [1, 2, 3200]
+sigmas = [1, 2, 7, 10]
 
 fig, axes = plt.subplots(len(sigmas), 3, figsize=(12, 2.5 * len(sigmas)))
 
@@ -25,15 +25,19 @@ for i, s in enumerate(sigmas):
     kernel_y = np.array([[-1, -2, -1],
                     [ 0,  0,  0],
                     [ 1,  2,  1]], dtype=np.float32)
+    
+    img2 = cv2.GaussianBlur(img, (0,0), sigmaX = s)
+    Ix = cv2.Sobel(img2, cv2.CV_64F, 1, 0, ksize = 3)
+    Iy = cv2.Sobel(img2, cv2.CV_64F, 0, 1, ksize = 3)
 
     #Calcul des Gradients
-    Ix = cv2.filter2D(img, -1, kernel_x)
-    Iy = cv2.filter2D(img, -1, kernel_y)
+    #Ix = cv2.filter2D(img, -1, kernel_x)
+    #Iy = cv2.filter2D(img, -1, kernel_y)
 
     #Gaussian fenetre pour reduire le bruit
     #Nous pouvons creer un gaussian kernel et faire des conv 
-    #ou utiliser la function du cv2
-    window_size = 7  # Taille de la fenetre gaussiane
+    #ou utilise la function du cv2
+    window_size = 5  # Taille de la fenetre gaussiane
     kernel_size = (window_size, window_size)
     alpha = 0.04  # Ponderation parameter [0.04, 0.06]
     sigma = np.sqrt(2 * s)
@@ -47,8 +51,6 @@ for i, s in enumerate(sigmas):
     det_M = Ixx * Iyy - Ixy**2  # Determinant of M
     trace_M = Ixx + Iyy  # Trace of M
     Theta = det_M - alpha * (trace_M**2)  # Harris response
-    
-
 
     # Calcul des maxima locaux et seuillage
     Theta_maxloc = cv2.copyMakeBorder(Theta,0,0,0,0,cv2.BORDER_REPLICATE)
@@ -83,7 +85,7 @@ for i, s in enumerate(sigmas):
     Theta_ml_dil = cv2.dilate(Theta_maxloc,se_croix)
     number_points = np.sum(Theta_ml_dil > 0)
     #Relecture image pour affichage couleur
-    Img_pts=cv2.imread('../Image_Pairs/Graffiti0.png',cv2.IMREAD_COLOR)
+    Img_pts=cv2.imread('Image_Pairs\\Graffiti0.png',cv2.IMREAD_COLOR)
     (h,w,c) = Img_pts.shape
     print("Dimension de l'image :",h,"lignes x",w,"colonnes x",c,"canaux")
     print("Type de l'image :",Img_pts.dtype, " Number of points : ", number_points,"\n")
